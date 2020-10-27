@@ -31,6 +31,16 @@ public class CDCollectionHandler {
      * @return - true, falls ein Platz frei war und die CD hinzugefügt werden konnte, sonst false.
      */
     public boolean addNewCD(int box, int place, String artist, String title) {
+        while(place >= allCDs[box].length){
+            CompactDisc[] newArr = new CompactDisc[allCDs[box].length+1];
+            int i = 0;
+            for (CompactDisc cd :
+                    allCDs[box]) {
+                newArr[i]=cd;
+                i++;
+            }
+            allCDs[box] = newArr;
+        }
         if (allCDs[box][place] == null) {
             allCDs[box][place] = new CompactDisc(artist, title);
             return true;
@@ -119,8 +129,68 @@ public class CDCollectionHandler {
     public void sort(int box) {
         pack(box);
         raddixSortUltraRecursiveTitle(box, getLongestName(box));
-        //raddixSortUltraRecursiveArtist(box,  getLongestArtist(box));
+        raddixSortUltraRecursiveArtist(box,  getLongestArtist(box));
 
+    }
+
+    private void raddixSortUltraRecursiveArtist(int box, int depth) {
+        if (depth> 0){
+            int[] counting = new int[27];
+            for (CompactDisc cd :
+                    allCDs[box]) {
+                if(cd.getArtist().length()<depth){
+                    counting[0]++;
+                }else{
+                    int charValue = cd.getArtist().charAt(depth-1);
+                    if(charValue == 32 || charValue == 46) counting[0]++;
+                    else {
+                        if(charValue < 97){
+                            charValue += 32;
+                        }
+                        charValue -= 96;
+                        counting[charValue]++;
+
+                    }
+
+                }
+
+            }
+            for(int i = 1; i < 27; i++){
+                counting[i] = counting[i] + counting[i-1];
+            }
+            for(int i = 26; i > 0; i--){
+                counting[i] = counting[i-1];
+            }
+            counting[0] = 0;
+            CompactDisc[] newSorted = new CompactDisc[allCDs[box].length];
+
+            for (CompactDisc cd :
+                    allCDs[box]) {
+                if(cd.getArtist().length()<depth){
+                    newSorted[counting[0]] = cd;
+                    counting[0]++;
+                }else{
+                    int charValue = cd.getArtist().charAt(depth -1);
+                    if(charValue == 32 || charValue == 46) {
+                        newSorted[counting[0]] = cd;
+                        counting[0]++;
+                    }
+                    else {
+                        if(charValue < 97){
+                            charValue += 32;
+                        }
+                        charValue -= 96;
+                        newSorted[counting[charValue]] = cd;
+                        counting[charValue]++;
+
+                    }
+
+                }
+
+            }
+            allCDs[box] = newSorted;
+            raddixSortUltraRecursiveArtist(box, depth - 1);
+        }
     }
 
 
@@ -148,7 +218,7 @@ public class CDCollectionHandler {
     }
 
     private void raddixSortUltraRecursiveTitle(int box, int depth) {
-        if (depth>= 0){
+        if (depth> 0){
             int[] counting = new int[27];
             for (CompactDisc cd :
                     allCDs[box]) {
@@ -156,7 +226,7 @@ public class CDCollectionHandler {
                     counting[0]++;
                 }else{
                     int charValue = cd.getTitle().charAt(depth-1);
-                    if(charValue == 32) counting[0]++;
+                    if(charValue == 32 || charValue == 46) counting[0]++;
                     else {
                         if(charValue < 97){
                             charValue += 32;
@@ -169,10 +239,10 @@ public class CDCollectionHandler {
                 }
 
             }
-            for(int i = 1; i < 26; i++){
+            for(int i = 1; i < 27; i++){
                 counting[i] = counting[i] + counting[i-1];
             }
-            for(int i = 1; i < 26; i++){
+            for(int i = 26; i > 0; i--){
                 counting[i] = counting[i-1];
             }
             counting[0] = 0;
@@ -185,7 +255,7 @@ public class CDCollectionHandler {
                     counting[0]++;
                 }else{
                     int charValue = cd.getTitle().charAt(depth -1);
-                    if(charValue == 32) {
+                    if(charValue == 32 || charValue == 46) {
                         newSorted[counting[0]] = cd;
                         counting[0]++;
                     }
