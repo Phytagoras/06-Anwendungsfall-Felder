@@ -35,18 +35,18 @@ public class MainPanelHandler {
     private JList[] allBoxes;
     private MainController controller;
 
-    public MainPanelHandler(MainController controller){
+    public MainPanelHandler(MainController controller) {
         this.controller = controller;
         outputArea.setText("Welcome to your CD-Administration-Tool.");
         createButtonListener();
         createBoxesAndListeners();
     }
 
-    public JPanel getPanel(){
+    public JPanel getPanel() {
         return panel;
     }
 
-    private void createButtonListener(){
+    private void createButtonListener() {
         packButton01.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -110,7 +110,7 @@ public class MainPanelHandler {
         });
     }
 
-    private void createBoxesAndListeners(){
+    private void createBoxesAndListeners() {
         allBoxes = new JList[4];
 
         allBoxes[0] = box01;
@@ -118,23 +118,23 @@ public class MainPanelHandler {
         allBoxes[2] = box03;
         allBoxes[3] = box04;
 
-        for(int i = 0; i < 4; i++){
+        for (int i = 0; i < 4; i++) {
             update(i);
         }
 
-        for(int i = 0; i < allBoxes.length; i++){
+        for (int i = 0; i < allBoxes.length; i++) {
             final int tmp = i;
             allBoxes[i].addListSelectionListener(new ListSelectionListener() {
                 @Override
                 public void valueChanged(ListSelectionEvent e) {
-                    if(!allBoxes[tmp].isSelectionEmpty()){
-                        bNrTextField.setText(String.valueOf(tmp+1));
-                        positionTextField.setText(String.valueOf(allBoxes[tmp].getSelectedIndex()+1));
-                        artistTextField.setText(controller.getSelectedCD(tmp,allBoxes[tmp].getSelectedIndex())[0]);
-                        titleTextField.setText(controller.getSelectedCD(tmp,allBoxes[tmp].getSelectedIndex())[1]);
+                    if (!allBoxes[tmp].isSelectionEmpty()) {
+                        bNrTextField.setText(String.valueOf(tmp + 1));
+                        positionTextField.setText(String.valueOf(allBoxes[tmp].getSelectedIndex() + 1));
+                        artistTextField.setText(controller.getSelectedCD(tmp, allBoxes[tmp].getSelectedIndex())[0]);
+                        titleTextField.setText(controller.getSelectedCD(tmp, allBoxes[tmp].getSelectedIndex())[1]);
                     }
-                    for(int j = 0; j < allBoxes.length; j++){
-                        if(allBoxes[j] != allBoxes[tmp])
+                    for (int j = 0; j < allBoxes.length; j++) {
+                        if (allBoxes[j] != allBoxes[tmp])
                             allBoxes[j].clearSelection();
                     }
                     selectTheRightBoxAndPlace();
@@ -144,61 +144,61 @@ public class MainPanelHandler {
         }
     }
 
-    private void selectTheRightBoxAndPlace(){
-        allBoxes[Integer.valueOf(bNrTextField.getText())-1].setSelectedIndex(Integer.valueOf(positionTextField.getText())-1);
+    private void selectTheRightBoxAndPlace() {
+        allBoxes[Integer.valueOf(bNrTextField.getText()) - 1].setSelectedIndex(Integer.valueOf(positionTextField.getText()) - 1);
     }
 
-    private void pack(int index){
-        controller.packBox(index-1);
-        update(index-1);
+    private void pack(int index) {
+        controller.packBox(index - 1);
+        update(index - 1);
     }
 
-    private void sort(int index){
-        controller.sortBox(index-1);
-        update(index-1);
+    private void sort(int index) {
+        controller.sortBox(index - 1);
+        update(index - 1);
     }
 
-    private void update(int index){
+    private void update(int index) {
         DefaultListModel listModel = new DefaultListModel();
 
         String[] output = controller.showAllCDs(index);
-        for(int i = 0; i < output.length; i = i + 2){
-            String outputText = output[i] + " - " + output[i+1];
+        for (int i = 0; i < output.length; i = i + 2) {
+            String outputText = output[i] + " - " + output[i + 1];
             listModel.addElement(outputText);
         }
 
         allBoxes[index].setModel(listModel);
     }
 
-    private void addNewCD(){
+    private void addNewCD() {
         int boxNumber = Integer.parseInt(bNrTextField.getText());
         int position = Integer.parseInt(positionTextField.getText());
         String artist = artistTextField.getText();
-        String title  = titleTextField.getText();
+        String title = titleTextField.getText();
 
-        if(controller.addNewCD(boxNumber-1,position-1,artist,title)){
-            addTextToOutput("Added new CD "+ artist + " - " + title);
-        }else{
+        if (controller.addNewCD(boxNumber - 1, position - 1, artist, title)) {
+            addTextToOutput("Added new CD " + artist + " - " + title);
+        } else {
             addTextToOutput("Adding a new CD failed. You might choose a different empty space.");
         }
 
-        update(boxNumber-1);
+        update(boxNumber - 1);
     }
 
-    private void releaseCD(){
+    private void releaseCD() {
         int boxNumber = Integer.parseInt(bNrTextField.getText());
         int position = Integer.parseInt(positionTextField.getText());
 
-        if(controller.releaseCD(boxNumber-1,position-1)){
+        if (controller.releaseCD(boxNumber - 1, position - 1)) {
             addTextToOutput("Released a CD.");
-        }else{
+        } else {
             addTextToOutput("Didn't find a CD to release. You might choose a different position.");
         }
 
-        update(boxNumber-1);
+        update(boxNumber - 1);
     }
 
-    private void addTextToOutput(String textToAdd){
+    private void addTextToOutput(String textToAdd) {
         outputArea.setText(outputArea.getText() + "\n" + textToAdd);
     }
 }
